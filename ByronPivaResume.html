@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Byron Piva · Full Stack Portfolio</title>
+  <!-- Google Fonts + Font Awesome 6 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a24;
+      --accent: #00e5ff;
+      --accent2: #7c3aed;
+      --accent3: #f59e0b;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --border: rgba(255, 255, 255, 0.07);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 17px;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .slide-inner {
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .slide-inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    #cursor {
+      position: fixed;
+      z-index: 9999;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+    }
+
+    #cursor-ring {
+      position: fixed;
+      z-index: 9998;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: left 0.1s ease-out, top 0.1s ease-out;
+    }
+
+    #stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.85s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.85s ease;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(100vw);
+    }
+
+    .slide.prev { transform: translateX(-100vw); opacity: 0; }
+    .slide.active { transform: translateX(0); opacity: 1; pointer-events: all; }
+    .slide.next { transform: translateX(100vw); opacity: 0; }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 70px 70px;
+      pointer-events: none;
+    }
+
+    .slide-inner {
+      position: relative;
+      z-index: 2;
+      width: min(1300px, 90vw);
+      max-height: 88vh;
+      padding-right: 6px;
+    }
+
+    #logo {
+      position: fixed;
+      top: 28px;
+      left: 36px;
+      z-index: 200;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 25px;
+      letter-spacing: 4px;
+      color: var(--accent);
+    }
+
+    #slide-counter {
+      position: fixed;
+      top: 32px;
+      right: 36px;
+      z-index: 200;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 2px;
+    }
+
+    #nav {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      padding: 8px 24px;
+      border-radius: 60px;
+      border: 1px solid var(--border);
+    }
+
+    .nav-btn {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 20px;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .nav-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 4px;
+      background: var(--muted);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      padding: 0;
+    }
+
+    .nav-dot.active {
+      background: var(--accent);
+      width: 28px;
+    }
+
+    #key-hint {
+      position: fixed;
+      bottom: 95px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      opacity: 0.6;
+      white-space: nowrap;
+      z-index: 200;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* HERO */
+    .hero-layout {
+      display: grid;
+      grid-template-columns: 1fr 0.6fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .hero-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--accent);
+      letter-spacing: 5px;
+      margin-bottom: 18px;
+    }
+    .hero-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(74px, 8vw, 125px);
+      line-height: 0.9;
+      letter-spacing: -1px;
+    }
+    .hero-name em {
+      color: var(--accent);
+      font-style: normal;
+    }
+    .hero-tagline {
+      font-size: 19px;
+      font-weight: 300;
+      color: var(--muted);
+      margin-top: 22px;
+      max-width: 480px;
+      line-height: 1.65;
+    }
+    .hero-contacts {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 36px;
+    }
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      color: #b9c7d9;
+    }
+    .contact-row a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    .contact-row a:hover {
+      text-decoration: underline;
+      opacity: 0.8;
+    }
+    .contact-icon {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--accent);
+    }
+
+    /* tech stack page */
+    .skills-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 72px;
+      align-items: start;
+    }
+    .skills-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 84px;
+      line-height: 0.9;
+      margin-bottom: 16px;
+    }
+    .skills-heading em { color: var(--accent); font-style: normal; }
+    .skills-sub {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    .skills-cats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .scat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+    }
+    .scat-icon { font-size: 28px; margin-bottom: 10px; }
+    .scat-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      background: rgba(255,255,255,0.04);
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #cbd5e6;
+    }
+    .chip i { color: var(--accent); font-size: 13px; }
+
+    /* timeline page - centered */
+    .tl-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px;
+      line-height: 0.9;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    .tl-heading em { color: var(--accent); }
+    .timeline-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 36px;
+      max-width: 700px;
+      width: 100%;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+      opacity: 0.5;
+    }
+    .tl-item {
+      margin-bottom: 32px;
+      padding-left: 28px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+      border-radius: 12px;
+      padding: 8px 16px 8px 28px;
+      margin-left: -16px;
+      margin-right: -16px;
+    }
+    .tl-item:hover {
+      background: rgba(0, 229, 255, 0.06);
+      transform: translateX(6px);
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -40px;
+      top: 16px;
+      width: 10px;
+      height: 10px;
+      background: var(--bg);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .tl-item:hover::before {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .tl-year {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+    }
+    .tl-duration {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent3);
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+    .tl-role {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 1px;
+    }
+    .tl-co { font-size: 15px; color: var(--muted); margin-top: 3px; }
+
+    /* job slide */
+    .job-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .job-left { position: relative; }
+    .job-big-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 170px;
+      color: rgba(255,255,255,0.02);
+      position: absolute;
+      top: -50px;
+      left: -24px;
+      pointer-events: none;
+    }
+    .job-period {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .period-dash { width: 36px; height: 1px; background: var(--accent); }
+    .duration-note {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent3);
+      margin-top: 5px;
+      margin-bottom: 12px;
+    }
+    .job-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(44px, 4vw, 64px);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .job-company {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--accent2);
+      margin-bottom: 6px;
+    }
+    .job-location {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .job-location span {
+      display: block;
+    }
+    .job-desc { font-size: 16px; line-height: 1.7; color: rgba(232,232,240,0.7); margin-bottom: 24px; }
+    .job-achievements {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .job-achievements li {
+      display: flex;
+      gap: 10px;
+      font-size: 15px;
+      color: rgba(232,232,240,0.65);
+    }
+    .job-achievements li::before { content: '▸'; color: var(--accent); }
+    .company-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .company-img {
+      width: 70px;
+      height: 70px;
+      background: #ffffff08;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .company-img img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      scale: 1;
+      filter: brightness(1) contrast(1.1);
+    }
+    .company-initials {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      color: var(--accent);
+      background: #0d111a;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .company-name-lg { font-weight: bold; margin-bottom: 2px; font-size: 1.2rem; }
+    .company-website {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--accent);
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    .company-website:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+    .company-website i {
+      font-size: 11px;
+    }
+    .tech-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: var(--muted);
+      margin: 18px 0 12px;
+    }
+    .tech-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .tag {
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    @media (max-width: 850px) {
+      .hero-layout, .job-layout, .skills-layout { grid-template-columns: 1fr; gap: 40px; }
+      .skills-heading { font-size: 58px; }
+      .tl-heading { font-size: 52px; }
+      .timeline { padding-left: 20px; }
+    }
+  </style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="logo">BP·DEV</div>
+<div id="slide-counter">01 / 10</div>
+<p id="key-hint">← → arrows • tap dots</p>
+
+<div id="stage"></div>
+<div id="nav">
+  <button class="nav-btn" id="btn-prev" disabled><i class="fas fa-chevron-left"></i></button>
+  <div id="dots-container"></div>
+  <button class="nav-btn" id="btn-next"><i class="fas fa-chevron-right"></i></button>
+</div>
+
+<script>
+  function getDuration(startStr, endStr) {
+    let start = new Date(startStr);
+    let end = endStr ? new Date(endStr) : new Date();
+    let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+    let years = Math.floor(months / 12);
+    let remMonths = months % 12;
+    if (years === 0) return `${remMonths} month${remMonths !== 1 ? 's' : ''}`;
+    if (remMonths === 0) return `${years} year${years !== 1 ? 's' : ''}`;
+    return `${years} year${years !== 1 ? 's' : ''} ${remMonths} month${remMonths !== 1 ? 's' : ''}`;
+  }
+
+  // Updated work experiences with location details (office + client regions) and Angular 18 added to SWStrategies
+  const workExperiences = [
+    { id:1, title:"Fullstack Developer & Tech Lead", company:"SWStrategies (via Edata)", startDate:"2021-07", endDate:null, 
+      officeLocation:"Remote from Costa Rica", clientRegions:"🇺🇸 US Clients",
+      description:"AI-driven QA automation, LLM integration, technical leadership for wealth management & private equity. Led architecture and mentored offshore team.", 
+      achievements:["Built Evertest AI framework → 70% reduction in test automation time (from 1 day to 1-3 hours).","LLM integration (Gemini/GPT) increased test coverage by 45%, enabling non-technical users.","Technical lead for Osaic, Zinnov, EverAg – reduced system modification turnaround by 20%.","Architected .NET 8 microservices & Azure cloud solutions for enterprise scale."], 
+      technologies:[".NET 8","C#","ASP.NET Core WebAPI","Azure","IdentityServer","LLMs (GPT/Gemini)","Entity Framework","LINQ","Angular 12","Angular 18","MS SQL","Azure DevOps","GitHub"], 
+      logoUrl:"https://swstrategies.com/wp-content/uploads/2023/12/swastrategies-logo.png.webp", fallbackInitials:"SW", websiteUrl:"https://swstrategies.com/" },
+    { id:2, title:"Fullstack Developer", company:"Encora", startDate:"2019-08", endDate:"2021-06", 
+      officeLocation:"Heredia, Costa Rica", clientRegions:"🇺🇸 US Clients",
+      description:"Analysis, development, maintenance of WebAPI integrations and .NET systems. Member of Production Support Team.", 
+      achievements:["Designed and upgraded WebAPI integrations for clients, ensuring high availability.","Maintained legacy systems and implemented new features using .NET stack.","Collaborated with cross-functional teams in Scrum environment."], 
+      technologies:["C#","ASP.NET WebAPI","IdentityServer","LINQ","Entity Framework 6","JavaScript","SQL Server","Visual Cron Jobs","Azure SQL"], 
+      logoUrl:"https://media.licdn.com/dms/image/v2/D560BAQH6NwBLGIaqig/company-logo_200_200/B56Zkz97AJJ8AI-/0/1757513494980/encorainc_logo?e=1779321600&v=beta&t=hW5MbCHAkBgwPScrsXusbQreDQcTf3RgPY6hSxigG-w", fallbackInitials:"EN", websiteUrl:"https://www.coforge.com/" },
+    { id:3, title:"Fullstack Developer", company:"Accenture", startDate:"2018-11", endDate:"2019-08", 
+      officeLocation:"Heredia, Costa Rica", clientRegions:"🇺🇸 US Clients · 🇨🇳 China · 🇮🇹 Italy",
+      description:"Analysis, development, and maintenance of center software. Coordinated design and implementation with business owners.", 
+      achievements:["Developed microservices and ASP.NET Core APIs.","Integrated Angular 5+ frontend with backend systems.","Ensured on-time delivery using Agile/Scrum."], 
+      technologies:["C#","WPF","ASP.NET Core","MicroServices","IdentityServer","Angular 5/6","TypeScript","Bootstrap 4","Node.js","Selenium"], 
+      logoUrl:"https://media.licdn.com/dms/image/v2/D4D0BAQEgtOEcxlXMog/company-logo_200_200/B4DZfqEQWkHAAQ-/0/1751978673981/accenture_logo?e=1779321600&v=beta&t=esHZSrWxgJ4SHTEtioU_HZTPEGjMQBK7ZFXCmvh0V8E", fallbackInitials:"AC", websiteUrl:"https://www.accenture.com/cr-en" },
+    { id:4, title:"Software Engineer", company:"Freelance", startDate:"2017-12", endDate:"2018-11", 
+      officeLocation:"San José, Costa Rica", clientRegions:"🇨🇷 Costa Rica (Financial & Electoral Systems)",
+      description:"Financial and electoral software development. Full-cycle design, QA, and deployment.", 
+      achievements:["Built national Financial System (markets, instruments, services).","Developed Elections System used by Costa Rica presidential parties 2018 (census, stats, transport)."], 
+      technologies:["C#","ASP.NET MVC","WebAPI","Java (Android)","JavaScript","jQuery","Bootstrap 4","Kendo UI","SQL Server"], 
+      logoUrl:null, fallbackInitials:"FL", websiteUrl:null },
+    { id:5, title:"Software Engineer", company:"Isthmus / 3Pillar Global", startDate:"2013-02", endDate:"2017-12", 
+      officeLocation:"Heredia, Costa Rica", clientRegions:"🇺🇸 US Clients",
+      description:"Inventory software, recruitment management, CRM, and MS Dynamics AX customization.", 
+      achievements:["Built Recruitment Management System for Isthmus internal use.","Enhanced Autobase Dealer CRM (customer retention, sales tools).","Worked on Microsoft Dynamics AX suite for financial & insurance sectors."], 
+      technologies:["C#","ASP.NET WebAPI","MVC5","AngularJS","Entity Framework","LINQ","JavaScript","jQuery","MS SQL","Jira"], 
+      logoUrl:"https://media.licdn.com/dms/image/v2/D4E0BAQFUwsW5O7m8CQ/company-logo_200_200/company-logo_200_200/0/1723122650899/3pillar_logo?e=1779321600&v=beta&t=kKikCwtW_TygYYY4QPy88T_vOdecKe5m-1QiZcO6llw", fallbackInitials:"3P", websiteUrl:"https://www.3pillarglobal.com/" },
+    { id:6, title:"Software Engineer", company:"Perfiles Tecnológicos S.A.", startDate:"2010-09", endDate:"2013-02", 
+      officeLocation:"San José, Costa Rica", clientRegions:"🇺🇸 US Clients · 🇵🇦 Panama · 🇬🇹 Guatemala",
+      description:"Healthcare systems, document workflow, and online query management system.", 
+      achievements:["Developed 'Folders' administration for workflow & document archiving.","Built 'Sistema de Manejo Online de Consultas' for psychological/educational support."], 
+      technologies:[".NET","C#","ASP.NET","SQL Server","JavaScript","jQuery","CSS"], 
+      logoUrl:"https://www.pertecglobal.com/media/logos/Logo-Pertec-2025-FondoBlanco-Transparente.png", fallbackInitials:"PT", websiteUrl:"https://www.pertecglobal.com/" },
+    { id:7, title:"Software Engineer", company:"Enmark S.A.", startDate:"2010-01", endDate:"2010-09", 
+      officeLocation:"Heredia, Costa Rica", clientRegions:"🇨🇷 Costa Rica (Sales & Inventory Systems)",
+      description:"Sales system development (invoices, credits, inventory, customers).", 
+      achievements:["Designed and implemented SysSales application for internal management.","Full lifecycle including training and deployment."], 
+      technologies:["C#","ASP.NET","SQL Server","JavaScript"], 
+      logoUrl:null, fallbackInitials:"EM", websiteUrl:null }
+  ];
+
+  const frontend = ["Angular 18","Angular 12","AngularJS","TypeScript","JavaScript","jQuery","HTML5/CSS3","Bootstrap","Kendo UI","Razor"];
+  const backend = [".NET 8","C#","ASP.NET Core WebAPI","Java Spring Boot","Node.js","Python/Django","GraphQL","REST API"];
+  const databases = ["SQL Server","Azure SQL","PostgreSQL","MySQL","MongoDB","Redis"];
+  const devops = ["Azure DevOps","Docker","Kubernetes","GitHub Actions","CI/CD","Jira","Trello"];
+  const aiTools = ["LLMs (GPT/Gemini)","AI Test Automation"];
+  
+  function buildTechStack() {
+    return `<div class="skills-layout"><div><div class="skills-heading">TECH<br><em>STACK</em></div><p class="skills-sub">15+ years — full spectrum of modern development & AI</p></div><div class="skills-cats">
+      <div class="scat"><div class="scat-icon"><i class="fab fa-angular"></i></div><div class="scat-name">Frontend</div><div class="chip-list">${frontend.map(t => `<span class="chip"><i class="fas fa-code"></i> ${t}</span>`).join('')}</div></div>
+      <div class="scat"><div class="scat-icon"><i class="fab fa-node-js"></i></div><div class="scat-name">Backend</div><div class="chip-list">${backend.map(t => `<span class="chip"><i class="fas fa-server"></i> ${t}</span>`).join('')}</div></div>
+      <div class="scat"><div class="scat-icon"><i class="fas fa-database"></i></div><div class="scat-name">Databases</div><div class="chip-list">${databases.map(t => `<span class="chip"><i class="fas fa-database"></i> ${t}</span>`).join('')}</div></div>
+      <div class="scat"><div class="scat-icon"><i class="fas fa-cloud"></i></div><div class="scat-name">DevOps & Tools</div><div class="chip-list">${devops.map(t => `<span class="chip"><i class="fas fa-cogs"></i> ${t}</span>`).join('')}</div></div>
+      <div class="scat"><div class="scat-icon"><i class="fas fa-brain"></i></div><div class="scat-name">AI / LLM</div><div class="chip-list">${aiTools.map(t => `<span class="chip"><i class="fas fa-robot"></i> ${t}</span>`).join('')}</div></div>
+    </div></div>`;
+  }
+
+  function buildTimeline() {
+    let items = workExperiences.map((exp, idx) => {
+      let duration = getDuration(exp.startDate, exp.endDate);
+      let dateRange = exp.startDate.slice(0,7) + ' — ' + (exp.endDate ? exp.endDate.slice(0,7) : 'Present');
+      return `<div class="tl-item" data-job-index="${idx}">
+        <div class="tl-year">${dateRange}</div>
+        <div class="tl-duration"><i class="far fa-clock"></i> ${duration}</div>
+        <div class="tl-role">${exp.title}</div>
+        <div class="tl-co">${exp.company}</div>
+      </div>`;
+    }).join('');
+    return `<div class="tl-heading">CAREER<br><em>TIMELINE</em></div>
+            <div class="timeline-wrapper"><div class="timeline">${items}</div></div>`;
+  }
+
+  function buildJobSlide(exp, idx) {
+    const startDisplay = exp.startDate.slice(0,7);
+    const endDisplay = exp.endDate ? exp.endDate.slice(0,7) : 'Present';
+    const duration = getDuration(exp.startDate, exp.endDate);
+    const techIcons = exp.technologies.map(t => {
+      let icon = '<i class="fas fa-code"></i>';
+      if (t.includes("C#")) icon = '<i class="fas fa-code"></i>';
+      else if (t.includes("Azure")) icon = '<i class="fab fa-microsoft"></i>';
+      else if (t.includes("Angular")) icon = '<i class="fab fa-angular"></i>';
+      else if (t.includes("JavaScript")) icon = '<i class="fab fa-js"></i>';
+      else if (t.includes("Entity")) icon = '<i class="fas fa-database"></i>';
+      else if (t.includes("LLM") || t.includes("GPT")) icon = '<i class="fas fa-brain"></i>';
+      else if (t.includes("Docker")) icon = '<i class="fab fa-docker"></i>';
+      else icon = '<i class="fas fa-microchip"></i>';
+      return `<span class="tag">${icon} ${t}</span>`;
+    }).join('');
+    let logoHtml = '';
+    if (exp.logoUrl) {
+      logoHtml = `<div class="company-img"><img src="${exp.logoUrl}" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'company-initials\'>${exp.fallbackInitials}</div>';" alt="logo"></div>`;
+    } else {
+      logoHtml = `<div class="company-img"><div class="company-initials">${exp.fallbackInitials}</div></div>`;
+    }
+    const websiteLink = exp.websiteUrl ? `<a href="${exp.websiteUrl}" target="_blank" rel="noopener noreferrer" class="company-website"><i class="fas fa-globe"></i> ${exp.websiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}</a>` : '';
+    return `<div class="job-layout"><div class="job-left"><div class="job-big-num">${String(idx+1).padStart(2,'0')}</div><div class="job-period"><div class="period-dash"></div>${startDisplay} — ${endDisplay}</div><div class="duration-note"><i class="far fa-clock"></i> ${duration}</div><div class="job-title">${exp.title}</div><div class="job-company">${exp.company}</div><div class="job-location"><span><i class="fas fa-building"></i> ${exp.officeLocation}</span><span><i class="fas fa-globe-americas"></i> ${exp.clientRegions}</span></div><div class="job-desc">${exp.description}</div><ul class="job-achievements">${exp.achievements.map(a => `<li>${a}</li>`).join('')}</ul></div><div class="job-right"><div class="company-card">${logoHtml}<div><div class="company-name-lg">${exp.company}</div><div style="font-size:12px;color:var(--muted);">Full-time</div>${websiteLink}</div></div><div class="tech-label"><i class="fas fa-microchip"></i> TECH STACK</div><div class="tech-grid">${techIcons}</div></div></div>`;
+  }
+
+  const heroSlide = `<div class="slide active" id="hero"><div class="blob" style="width:500px;height:500px;background:rgba(0,229,255,.06);top:-100px;right:-100px;"></div><div class="slide-inner"><div class="hero-layout"><div><p class="hero-eyebrow">FULL STACK ARCHITECT / TECH LEAD</p><h1 class="hero-name">BYRON<br><em>PIVA</em></h1><p class="hero-tagline">15+ years delivering enterprise software .NET, Azure, AI Automation. Technical leader with track record in wealth management, fintech, and scalable cloud platforms.</p><div class="hero-contacts"><div class="contact-row"><div class="contact-icon"><i class="fas fa-phone-alt"></i></div><span>+506 8334 5003</span></div><div class="contact-row"><div class="contact-icon"><i class="fas fa-envelope"></i></div><a href="mailto:bpiva89@hotmail.com">bpiva89@hotmail.com</a></div><div class="contact-row"><div class="contact-icon"><i class="fab fa-github"></i></div><a href="https://github.com/bpiva89" target="_blank">github.com/bpiva89</a></div><div class="contact-row"><div class="contact-icon"><i class="fab fa-linkedin"></i></div><a href="#">linkedin.com/in/byron-piva</a></div><div class="contact-row"><div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div><span>Costa Rica · Open to Remote</span></div></div></div><div></div></div></div></div>`;
+
+  const stage = document.getElementById('stage');
+  stage.innerHTML = heroSlide;
+  const techDiv = document.createElement('div'); techDiv.className = 'slide next'; techDiv.innerHTML = `<div class="blob" style="width:450px;height:450px;background:rgba(124,58,237,.06);bottom:-80px;left:-80px;"></div><div class="slide-inner">${buildTechStack()}</div>`; stage.appendChild(techDiv);
+  const timelineDiv = document.createElement('div'); timelineDiv.className = 'slide next'; timelineDiv.innerHTML = `<div class="blob" style="width:400px;height:400px;background:rgba(0,229,255,.05);top:-60px;right:-60px;"></div><div class="slide-inner">${buildTimeline()}</div>`; stage.appendChild(timelineDiv);
+  workExperiences.forEach((exp, i) => { const jobDiv = document.createElement('div'); jobDiv.className = 'slide next'; jobDiv.innerHTML = `<div class="blob" style="width:450px;height:450px;background:rgba(245,158,11,.05);bottom:-80px;right:-80px;"></div><div class="slide-inner">${buildJobSlide(exp, i)}</div>`; stage.appendChild(jobDiv); });
+
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const dotsContainer = document.getElementById('dots-container');
+  const prevBtn = document.getElementById('btn-prev');
+  const nextBtn = document.getElementById('btn-next');
+  const counterSpan = document.getElementById('slide-counter');
+  let currentIdx = 0;
+
+  function updateSlidesAndNav(index) {
+    if (index < 0 || index >= totalSlides) return;
+    slides.forEach((s, i) => { s.classList.remove('active', 'prev', 'next'); if (i === index) s.classList.add('active'); else if (i < index) s.classList.add('prev'); else s.classList.add('next'); });
+    const allDots = document.querySelectorAll('.nav-dot'); allDots.forEach((dot, i) => { if (i === index) dot.classList.add('active'); else dot.classList.remove('active'); });
+    prevBtn.disabled = index === 0; nextBtn.disabled = index === totalSlides - 1;
+    counterSpan.innerText = `${String(index+1).padStart(2,'0')} / ${String(totalSlides).padStart(2,'0')}`;
+    currentIdx = index;
+  }
+  function goTo(idx) { updateSlidesAndNav(idx); }
+  prevBtn.addEventListener('click', () => goTo(currentIdx - 1));
+  nextBtn.addEventListener('click', () => goTo(currentIdx + 1));
+  document.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') goTo(currentIdx - 1); if (e.key === 'ArrowRight') goTo(currentIdx + 1); });
+
+  for (let i = 0; i < totalSlides; i++) { const dot = document.createElement('button'); dot.classList.add('nav-dot'); if (i === 0) dot.classList.add('active'); dot.dataset.idx = i; dot.addEventListener('click', () => goTo(i)); dotsContainer.appendChild(dot); }
+  updateSlidesAndNav(0);
+
+  // Attach click handlers to timeline items to jump to corresponding job slide
+  function bindTimelineClicks() {
+    const timelineSlide = slides[2]; // timeline slide is at index 2
+    if (!timelineSlide) return;
+    const items = timelineSlide.querySelectorAll('.tl-item');
+    items.forEach((item, idx) => {
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const targetSlideIndex = 3 + idx; // job slides start at index 3
+        if (targetSlideIndex < totalSlides) goTo(targetSlideIndex);
+      });
+    });
+  }
+  setTimeout(bindTimelineClicks, 100);
+
+  const cur = document.getElementById('cursor'), ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx+'px'; cur.style.top = my+'px'; });
+  function animCursor() { rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(animCursor); }
+  animCursor();
+</script>
+</body>
+</html>
