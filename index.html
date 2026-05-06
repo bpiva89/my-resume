@@ -573,11 +573,147 @@
       pointer-events: none;
       z-index: 0;
     }
+    /* IFM Clients Section */
+    .ifm-section {
+      margin-top: 56px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+    }
+    .ifm-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      padding: 10px 0;
+      user-select: none;
+      transition: opacity 0.2s;
+    }
+    .ifm-header:hover {
+      opacity: 0.85;
+    }
+    .ifm-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(124,58,237,0.12));
+      border: 1px solid rgba(0,229,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .ifm-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 2px;
+      line-height: 1;
+      flex: 1;
+    }
+    .ifm-title em {
+      color: var(--accent);
+      font-style: normal;
+    }
+    .ifm-chevron {
+      font-size: 18px;
+      color: var(--accent);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+    }
+    .ifm-section.open .ifm-chevron {
+      transform: rotate(180deg);
+    }
+    .ifm-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+      opacity: 0;
+    }
+    .ifm-section.open .ifm-body {
+      max-height: 600px;
+      opacity: 1;
+    }
+    .ifm-body-inner {
+      padding-top: 16px;
+    }
+    .ifm-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 28px;
+      max-width: 700px;
+    }
+    .ifm-subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--accent);
+      margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+    .ifm-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      margin-left: auto;
+      opacity: 0.7;
+    }
+    .ifm-section.open .ifm-hint {
+      display: none;
+    }
+    .ifm-clients-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+    .ifm-client-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.3s ease;
+    }
+    .ifm-client-card:hover {
+      transform: scale(1.08);
+    }
+    .ifm-client-logo {
+      width: 160px;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.95);
+      border-radius: 14px;
+      padding: 14px 18px;
+    }
+    .ifm-client-logo img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    .ifm-client-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      text-align: center;
+    }
     @media (max-width: 850px) {
       .hero-layout, .job-layout, .skills-layout { grid-template-columns: 1fr; gap: 40px; }
       .skills-heading { font-size: 58px; }
       .tl-heading { font-size: 52px; }
       .timeline { padding-left: 20px; }
+      .ifm-clients-grid { gap: 20px; }
+    }
+    @media (max-width: 500px) {
+      .ifm-client-logo { width: 120px; height: 70px; }
     }
   </style>
 </head>
@@ -617,10 +753,18 @@
       logoUrl:"https://swstrategies.com/wp-content/uploads/2023/12/swastrategies-logo.png.webp", fallbackInitials:"SW", websiteUrl:"https://swstrategies.com/" },
     { id:2, title:"Fullstack Developer", company:"Encora", startDate:"2019-08", endDate:"2021-06", 
       officeLocation:"Heredia, Costa Rica", clientRegions:"🇺🇸 US Clients",
-      description:"Analysis, development, maintenance of WebAPI integrations and .NET systems. Member of Production Support Team.", 
-      achievements:["Designed and upgraded WebAPI integrations for clients, ensuring high availability.","Maintained legacy systems and implemented new features using .NET stack.","Collaborated with cross-functional teams in Scrum environment."], 
+      description:"Analysis, development, maintenance of WebAPI integrations and .NET systems. Member of Production Support Team. Developed and maintained an Integrated Facility Management (IFM) system handling maintenance work orders for major US retail and logistics clients.", 
+      achievements:["Designed and upgraded WebAPI integrations for clients, ensuring high availability.","Maintained legacy systems and implemented new features using .NET stack.","Collaborated with cross-functional teams in Scrum environment.","Built and maintained IFM system for maintenance work order management across major retail clients."], 
       technologies:["C#","ASP.NET WebAPI","IdentityServer","LINQ","Entity Framework 6","JavaScript","SQL Server","Visual Cron Jobs","Azure SQL"], 
-      logoUrl:"https://media.licdn.com/dms/image/v2/D560BAQH6NwBLGIaqig/company-logo_200_200/B56Zkz97AJJ8AI-/0/1757513494980/encorainc_logo?e=1779321600&v=beta&t=hW5MbCHAkBgwPScrsXusbQreDQcTf3RgPY6hSxigG-w", fallbackInitials:"EN", websiteUrl:"https://www.coforge.com/" },
+      logoUrl:"https://media.licdn.com/dms/image/v2/D560BAQH6NwBLGIaqig/company-logo_200_200/B56Zkz97AJJ8AI-/0/1757513494980/encorainc_logo?e=1779321600&v=beta&t=hW5MbCHAkBgwPScrsXusbQreDQcTf3RgPY6hSxigG-w", fallbackInitials:"EN", websiteUrl:"https://www.coforge.com/",
+      ifmClients: [
+        { name: "7-Eleven", logo: "logos/7eleven.svg" },
+        { name: "Lowe's", logo: "logos/lowes.svg" },
+        { name: "Office Depot", logo: "logos/office-depot.svg" },
+        { name: "FedEx", logo: "logos/fedex.svg" },
+        { name: "Walmart", logo: "logos/walmart.svg" }
+      ]
+    },
     { id:3, title:"Fullstack Developer", company:"Accenture", startDate:"2018-11", endDate:"2019-08", 
       officeLocation:"Heredia, Costa Rica", clientRegions:"🇺🇸 US Clients · 🇨🇳 China · 🇮🇹 Italy",
       description:"Analysis, development, and maintenance of center software. Coordinated design and implementation with business owners.", 
@@ -707,7 +851,34 @@
       logoHtml = `<div class="company-img"><div class="company-initials">${exp.fallbackInitials}</div></div>`;
     }
     const websiteLink = exp.websiteUrl ? `<a href="${exp.websiteUrl}" target="_blank" rel="noopener noreferrer" class="company-website"><i class="fas fa-globe"></i> ${exp.websiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}</a>` : '';
-    return `<div class="job-layout"><div class="job-left"><div class="job-big-num">${String(idx+1).padStart(2,'0')}</div><div class="job-period"><div class="period-dash"></div>${startDisplay} — ${endDisplay}</div><div class="duration-note"><i class="far fa-clock"></i> ${duration}</div><div class="job-title">${exp.title}</div><div class="job-company">${exp.company}</div><div class="job-location"><span><i class="fas fa-building"></i> ${exp.officeLocation}</span><span><i class="fas fa-globe-americas"></i> ${exp.clientRegions}</span></div><div class="job-desc">${exp.description}</div><ul class="job-achievements">${exp.achievements.map(a => `<li>${a}</li>`).join('')}</ul></div><div class="job-right"><div class="company-card">${logoHtml}<div><div class="company-name-lg">${exp.company}</div><div style="font-size:12px;color:var(--muted);">Full-time</div>${websiteLink}</div></div><div class="tech-label"><i class="fas fa-microchip"></i> TECH STACK</div><div class="tech-grid">${techIcons}</div></div></div>`;
+    // Build IFM section if this experience has IFM clients
+    let ifmHtml = '';
+    if (exp.ifmClients && exp.ifmClients.length > 0) {
+      const clientCards = exp.ifmClients.map(client => `
+        <div class="ifm-client-card">
+          <div class="ifm-client-logo"><img src="${client.logo}" alt="${client.name} logo" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='block')"></div>
+          <div class="ifm-client-name">${client.name}</div>
+        </div>
+      `).join('');
+      ifmHtml = `
+        <div class="ifm-section" id="ifm-toggle">
+          <div class="ifm-header" onclick="document.getElementById('ifm-toggle').classList.toggle('open')">
+            <div class="ifm-icon"><i class="fas fa-tools"></i></div>
+            <div class="ifm-title">INTEGRATED <em>FACILITY MANAGEMENT</em></div>
+            <span class="ifm-hint">Click to expand</span>
+            <i class="fas fa-chevron-down ifm-chevron"></i>
+          </div>
+          <div class="ifm-body">
+            <div class="ifm-body-inner">
+              <p class="ifm-desc">Developed and maintained an IFM system for maintenance work order management, serving major US retail and logistics brands. The platform streamlined facility operations, work order tracking, and vendor coordination across thousands of locations.</p>
+              <div class="ifm-subtitle"><i class="fas fa-handshake"></i>&nbsp; Clients We Served</div>
+              <div class="ifm-clients-grid">${clientCards}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    return `<div class="job-layout"><div class="job-left"><div class="job-big-num">${String(idx+1).padStart(2,'0')}</div><div class="job-period"><div class="period-dash"></div>${startDisplay} — ${endDisplay}</div><div class="duration-note"><i class="far fa-clock"></i> ${duration}</div><div class="job-title">${exp.title}</div><div class="job-company">${exp.company}</div><div class="job-location"><span><i class="fas fa-building"></i> ${exp.officeLocation}</span><span><i class="fas fa-globe-americas"></i> ${exp.clientRegions}</span></div><div class="job-desc">${exp.description}</div><ul class="job-achievements">${exp.achievements.map(a => `<li>${a}</li>`).join('')}</ul></div><div class="job-right"><div class="company-card">${logoHtml}<div><div class="company-name-lg">${exp.company}</div><div style="font-size:12px;color:var(--muted);">Full-time</div>${websiteLink}</div></div><div class="tech-label"><i class="fas fa-microchip"></i> TECH STACK</div><div class="tech-grid">${techIcons}</div></div></div>${ifmHtml}`;
   }
 
   const heroSlide = `<div class="slide active" id="hero"><div class="blob" style="width:500px;height:500px;background:rgba(0,229,255,.06);top:-100px;right:-100px;"></div><div class="slide-inner"><div class="hero-layout"><div><p class="hero-eyebrow">FULL STACK ARCHITECT / TECH LEAD</p><h1 class="hero-name">BYRON<br><em>PIVA</em></h1><p class="hero-tagline">15+ years delivering enterprise software .NET, Azure, AI Automation. Technical leader with track record in wealth management, fintech, and scalable cloud platforms.</p><div class="hero-contacts"><div class="contact-row"><div class="contact-icon"><i class="fas fa-phone-alt"></i></div><span>+506 8334 5003</span></div><div class="contact-row"><div class="contact-icon"><i class="fas fa-envelope"></i></div><a href="mailto:bpiva89@hotmail.com">bpiva89@hotmail.com</a></div><div class="contact-row"><div class="contact-icon"><i class="fab fa-github"></i></div><a href="https://github.com/bpiva89" target="_blank">github.com/bpiva89</a></div><div class="contact-row"><div class="contact-icon"><i class="fab fa-linkedin"></i></div><a href="#">linkedin.com/in/byron-piva</a></div><div class="contact-row"><div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div><span>Costa Rica · Open to Remote</span></div></div></div><div></div></div></div></div>`;
