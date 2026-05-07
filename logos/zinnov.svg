@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100">
+  <defs>
+    <linearGradient id="zg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5bb8e8"/>
+      <stop offset="100%" style="stop-color:#2a7db5"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="100" rx="12" fill="url(#zg)"/>
+  <text x="30" y="68" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="52" fill="#ffffff" letter-spacing="2">zinnov</text>
+  <!-- decorative arcs -->
+  <ellipse cx="340" cy="50" rx="50" ry="40" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  <ellipse cx="340" cy="50" rx="35" ry="28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  <ellipse cx="340" cy="50" rx="22" ry="18" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+</svg>

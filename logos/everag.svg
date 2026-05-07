@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100">
+  <text x="20" y="72" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="60" fill="#2d8a3e">Ever</text>
+  <text x="195" y="72" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="60" fill="#1b6b9a">Ag</text>
+  <!-- leaf accent -->
+  <path d="M275 30 Q285 15 300 25 Q290 35 280 32 Z" fill="#2d8a3e" opacity="0.8"/>
+</svg>
